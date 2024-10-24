@@ -4130,7 +4130,7 @@ static void writeGroupTreeNode(OutputList &ol, const GroupDef *gd, int level, FT
           }
         }
       }
-      else if (lde->kind()==LayoutDocEntry::GroupConcepts && addToIndex)
+      else if (lde->kind()==LayoutDocEntry::GroupConcepts && addToIndex && Config_getBool(SHOW_CONCEPTS))
       {
         for (const auto &cd : gd->getConcepts())
         {
@@ -4138,7 +4138,7 @@ static void writeGroupTreeNode(OutputList &ol, const GroupDef *gd, int level, FT
           {
             Doxygen::indexList->addContentsItem(FALSE,
                 cd->displayName(),cd->getReference(),
-                cd->getOutputFileBase(),QCString(),FALSE,addToIndex);
+                cd->getOutputFileBase(),QCString(),FALSE,Config_getBool(SHOW_CONCEPTS));
           }
         }
       }
@@ -4928,7 +4928,7 @@ static void writeIndex(OutputList &ol)
         ol.endIndexSection(IndexSection::isNamespaceIndex);
       }
     }
-    if (index.numDocumentedConcepts()>0)
+    if (Config_getBool(SHOW_CONCEPTS) && (index.numDocumentedConcepts()>0))
     {
       ol.startIndexSection(IndexSection::isConceptIndex);
       ol.parseText(/*projPrefix+*/theTranslator->trConceptIndex());
@@ -5168,8 +5168,14 @@ static void writeIndexHierarchyEntries(OutputList &ol,const LayoutNavEntryList &
           }
           break;
         case LayoutNavEntry::Concepts:
-          msg("Generating concept index...\n");
-          writeConceptIndex(ol);
+          {
+            bool showConcepts = Config_getBool(SHOW_CONCEPTS);
+            if (showConcepts)
+            {
+              msg("Generating concept index...\n");
+              writeConceptIndex(ol);
+            }
+          }
           break;
         case LayoutNavEntry::ClassList:
           msg("Generating annotated compound index...\n");
@@ -5389,6 +5395,7 @@ static bool quickLinkVisible(LayoutNavEntry::Kind kind)
 {
   const auto &index = Index::instance();
   bool showNamespaces = Config_getBool(SHOW_NAMESPACES);
+  bool showConcepts = Config_getBool(SHOW_CONCEPTS);
   bool showFiles = Config_getBool(SHOW_FILES);
   bool sliceOpt = Config_getBool(OPTIMIZE_OUTPUT_SLICE);
   switch (kind)
@@ -5404,7 +5411,7 @@ static bool quickLinkVisible(LayoutNavEntry::Kind kind)
     case LayoutNavEntry::Namespaces:         return index.numDocumentedNamespaces()>0 && showNamespaces;
     case LayoutNavEntry::NamespaceList:      return index.numDocumentedNamespaces()>0 && showNamespaces;
     case LayoutNavEntry::NamespaceMembers:   return index.numDocumentedNamespaceMembers(NamespaceMemberHighlight::All)>0;
-    case LayoutNavEntry::Concepts:           return index.numDocumentedConcepts()>0;
+    case LayoutNavEntry::Concepts:           return index.numDocumentedConcepts()>0 && showConcepts;
     case LayoutNavEntry::Classes:            return index.numAnnotatedClasses()>0;
     case LayoutNavEntry::ClassList:          return index.numAnnotatedClasses()>0;
     case LayoutNavEntry::ClassIndex:         return index.numAnnotatedClasses()>0;

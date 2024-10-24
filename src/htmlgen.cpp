@@ -2708,6 +2708,7 @@ static bool quickLinkVisible(LayoutNavEntry::Kind kind)
 {
   const auto &index = Index::instance();
   bool showNamespaces = Config_getBool(SHOW_NAMESPACES);
+  bool showConcepts = Config_getBool(SHOW_CONCEPTS);
   bool showFiles = Config_getBool(SHOW_FILES);
   switch (kind)
   {
@@ -2722,7 +2723,7 @@ static bool quickLinkVisible(LayoutNavEntry::Kind kind)
     case LayoutNavEntry::Namespaces:         return showNamespaces && index.numDocumentedNamespaces()>0;
     case LayoutNavEntry::NamespaceList:      return showNamespaces && index.numDocumentedNamespaces()>0;
     case LayoutNavEntry::NamespaceMembers:   return showNamespaces && index.numDocumentedNamespaceMembers(NamespaceMemberHighlight::All)>0;
-    case LayoutNavEntry::Concepts:           return index.numDocumentedConcepts()>0;
+    case LayoutNavEntry::Concepts:           return showConcepts && index.numDocumentedConcepts()>0;
     case LayoutNavEntry::Classes:            return index.numAnnotatedClasses()>0;
     case LayoutNavEntry::ClassList:          return index.numAnnotatedClasses()>0;
     case LayoutNavEntry::ClassIndex:         return index.numAnnotatedClasses()>0;
